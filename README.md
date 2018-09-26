@@ -92,7 +92,7 @@ var myLeafMap = new LeafMapApi({
 myLeafMap.gotoMarker(id);
 ```
 
-### Filters initial markers by "valueToCompare". Filter function can be set with "setFilterFn" or given in the inital config object
+#### Filters initial markers by "valueToCompare". Filter function can be set with "setFilterFn" or given in the inital config object
 ```javascript
 myLeafMap.filterMarkers(valueToCompare);
 ```
