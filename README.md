@@ -126,16 +126,18 @@ myLeafMap.flyToBounds();
 ```
 
 
-/**
-	EVENTS
-*/
+# Events
 
-	// CALLED ON MARKER CLICK
-	myLeafMap.on('markerClick', function(event, markerEvent) {
-		console.log(markerEvent);
-	});
+### Called on marker click
+```javascript
+myLeafMap.on('markerClick', function(event, markerEvent) {
+	console.log(markerEvent);
+});
+```
 
-	// CALLED ON MARKER POPUP CLOSE
-	myLeafMap.on('markerPopupClose', function(event, markerEvent) {
-		console.log(markerEvent);
-	});
+### Called on marker popup close
+```javascript
+myLeafMap.on('markerPopupClose', function(event, markerEvent) {
+	console.log(markerEvent);
+});
+```
