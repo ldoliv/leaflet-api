@@ -3,7 +3,7 @@ Abstraction layer for leaflet maps
 
 
 
-// MARKER STRUCTURE:
+# MARKER STRUCTURE:
 markers.push({
 	id: 127,
 	title: 'Mini Tour',
