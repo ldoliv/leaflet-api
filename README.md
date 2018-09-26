@@ -16,7 +16,7 @@ markers.push({
 
 
 
-# Leaflet Api Constructor Options
+## Leaflet Api Constructor Options
 ```javascript
 var myLeafMap = new LeafMapApi({
 	mapIdSelector: mapContainer,
