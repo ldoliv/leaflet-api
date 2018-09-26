@@ -2,7 +2,7 @@
 Abstraction layer for leaflet maps
 
 
-# Marker Example Structure:
+## Marker Example Structure:
 ```javascript
 markers.push({
 	id: 127,
