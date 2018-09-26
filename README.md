@@ -22,6 +22,7 @@ markers.push({
 var myLeafMap = new LeafMapApi({
 
 	mapIdSelector: mapContainer,
+	markersData: markers,
 	mapOptions: {
 		center: [37.117435, -8.645256],
 		minZoom: 2,
@@ -35,7 +36,6 @@ var myLeafMap = new LeafMapApi({
 		easeLinearity: 1,
 		animate: true,
 	},
-	markersData: markers,
 	markerIcon: {
 		className: 'pointer',
 		iconSize: [26, 35],
@@ -87,13 +87,18 @@ var myLeafMap = new LeafMapApi({
 
 # Methods
 
-## Fly to a specific marker given an ID
+### Fly to a specific marker given an ID
+```javascript
 myLeafMap.gotoMarker(id);
+```
 
-// FILTERS INITIAL MARKERS BY VALUE TO COMPARE. FILTER FUNCTION CAN BE SET OR GIVEN IN THE INITIAL CONFIG OBJECT
+### Filters initial markers by "valueToCompare". Filter function can be set with "setFilterFn" or given in the inital config object
+```javascript
 myLeafMap.filterMarkers(valueToCompare);
+```
 
-// SET THE FILTER FUNCTION TO COMPARE THE MARKERS
+### Set the filter function to compare the markers
+```javascript
 myLeafMap.setFilterFn(function(filter, marker) {
 	var catId = marker.options.markerData.catId;
 
@@ -102,15 +107,22 @@ myLeafMap.setFilterFn(function(filter, marker) {
 	else
 		return false;
 });
+```
 
-// SHOWS ALL MARKERS
+### Shows all markers
+```javascript
 myLeafMap.showAllMarkers();
+```
 
-// CLOSES ALL OR SPECIFIC POPUP
+### Closes all or specific popup
+```javascript
 myLeafMap.closePopup(popup);
+```
 
-// FLY TO BOUNDS PREVIOUSLY SET
+### Fly to bounds previously set
+```javascript
 myLeafMap.flyToBounds();
+```
 
 
 /**
