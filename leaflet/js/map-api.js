@@ -216,6 +216,7 @@ var LeafMapApi;
 					// iconSize: [30, 35],
 					// iconAnchor: [15, 35],
 				})),
+				riseOnHover: true,
 				// lngLat: [latlng.lng, latlng.lat]
 			});
 		}

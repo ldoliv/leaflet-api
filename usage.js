@@ -3,10 +3,11 @@
 markers.push({
 	id: 127,
 	title: 'Mini Tour',
-	pinImg: 'http://www.madeira-pass.com/magento/skin/frontend/rwd/madeirapass/images/map/pin_blue.png',
+	pinImg: '/images/map/pin_blue.png',
+	photo: '/images/map/photo.png',
 	lat: 32.642656,
 	lng: -16.829063,
-	link: 'http://www.madeira-pass.com/magento/index.php/experiencias/mini-tour.html'
+	link: 'http://www.example.com/mini-tour.html'
 });
 
 
@@ -15,6 +16,7 @@ markers.push({
 var myLeafMap = new LeafMapApi({
 
 	mapIdSelector: mapContainer,
+	markersData: markers,
 	mapOptions: {
 		center: [37.117435, -8.645256],
 		minZoom: 2,
@@ -23,24 +25,20 @@ var myLeafMap = new LeafMapApi({
 		scrollWheelZoom: false,
 	},
 	mapFlyOptions: {
-		// duration: 3,
+		padding: [30, 30],
+		duration: 1,
+		easeLinearity: 1,
+		animate: true,
 	},
-	markersData: markers,
 	markerIcon: {
 		className: 'pointer',
-		//iconUrl: "../Content/Images/ie7/pin-shadow.png",
-		//iconUrl: "pin-shadow.png",
-		// html: "<img src='../images/map/pin.png'/>",
 		iconSize: [26, 35],
 		iconAnchor: [15, 35],
 		popupAnchor: [0, -35]
 	},
 	showMyMarker: false,
 	myMarkerIcon: {
-		//className: 'normalMarker-marker',
-		//iconUrl: "../Content/Images/ie7/pin-shadow.png",
-		//iconUrl: "pin-shadow.png",
-		// html: "<img src='../images/map/pin.png'/>",
+		className: '',
 		iconSize: [26, 26],
 		iconAnchor: [15, 35],
 		popupAnchor: [0, -35]
