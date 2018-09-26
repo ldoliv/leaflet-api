@@ -2,8 +2,7 @@
 Abstraction layer for leaflet maps
 
 
-
-# MARKER STRUCTURE:
+# Marker Example Structure:
 markers.push({
 	id: 127,
 	title: 'Mini Tour',
@@ -15,9 +14,8 @@ markers.push({
 
 
 
-// LEAFLET MAP API CONSTRUCTOR
+# Leaflet Api Constructor Options
 var myLeafMap = new LeafMapApi({
-
 	mapIdSelector: mapContainer,
 	mapOptions: {
 		center: [37.117435, -8.645256],
@@ -84,9 +82,7 @@ var myLeafMap = new LeafMapApi({
 });
 
 
-/**
-	METHODS
-*/
+# Methods
 
 	// FLY TO SPECIFIC MARKER GIVEN AN ID
 	myLeafMap.gotoMarker(id);
