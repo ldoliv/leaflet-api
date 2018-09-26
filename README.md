@@ -3,6 +3,7 @@ Abstraction layer for leaflet maps
 
 
 # Marker Example Structure:
+```javascript
 markers.push({
 	id: 127,
 	title: 'Mini Tour',
@@ -11,10 +12,12 @@ markers.push({
 	lng: -16.829063,
 	link: 'http://www.madeira-pass.com/magento/index.php/experiencias/mini-tour.html'
 });
+```
 
 
 
 # Leaflet Api Constructor Options
+```javascript
 var myLeafMap = new LeafMapApi({
 	mapIdSelector: mapContainer,
 	mapOptions: {
@@ -80,6 +83,7 @@ var myLeafMap = new LeafMapApi({
 			return false;
 	}
 });
+```
 
 
 # Methods
