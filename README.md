@@ -87,30 +87,30 @@ var myLeafMap = new LeafMapApi({
 
 # Methods
 
-	// FLY TO SPECIFIC MARKER GIVEN AN ID
-	myLeafMap.gotoMarker(id);
+## Fly to a specific marker given an ID
+myLeafMap.gotoMarker(id);
 
-	// FILTERS INITIAL MARKERS BY VALUE TO COMPARE. FILTER FUNCTION CAN BE SET OR GIVEN IN THE INITIAL CONFIG OBJECT
-	myLeafMap.filterMarkers(valueToCompare);
+// FILTERS INITIAL MARKERS BY VALUE TO COMPARE. FILTER FUNCTION CAN BE SET OR GIVEN IN THE INITIAL CONFIG OBJECT
+myLeafMap.filterMarkers(valueToCompare);
 
-	// SET THE FILTER FUNCTION TO COMPARE THE MARKERS
-	myLeafMap.setFilterFn(function(filter, marker) {
-		var catId = marker.options.markerData.catId;
+// SET THE FILTER FUNCTION TO COMPARE THE MARKERS
+myLeafMap.setFilterFn(function(filter, marker) {
+	var catId = marker.options.markerData.catId;
 
-		if (filter == catId)
-			return true;
-		else
-			return false;
-	});
+	if (filter == catId)
+		return true;
+	else
+		return false;
+});
 
-	// SHOWS ALL MARKERS
-	myLeafMap.showAllMarkers();
+// SHOWS ALL MARKERS
+myLeafMap.showAllMarkers();
 
-	// CLOSES ALL OR SPECIFIC POPUP
-	myLeafMap.closePopup(popup);
+// CLOSES ALL OR SPECIFIC POPUP
+myLeafMap.closePopup(popup);
 
-	// FLY TO BOUNDS PREVIOUSLY SET
-	myLeafMap.flyToBounds();
+// FLY TO BOUNDS PREVIOUSLY SET
+myLeafMap.flyToBounds();
 
 
 /**
