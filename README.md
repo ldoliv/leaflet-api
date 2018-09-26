@@ -2,6 +2,34 @@
 Abstraction layer for leaflet maps
 
 
+## HTML Includes
+<head>
+	<!-- JAVASCRIPT -->
+
+	<!-- leaflet -->
+	<script type="text/javascript" src="/leaflet/js/leaflet.js"></script>
+
+	<!-- leaflet clusters -->
+	<script type="text/javascript" src="/leaflet/js/leaflet.markercluster.js"></script>
+
+	<!-- leaflet custom api -->
+	<script type="text/javascript" src="/leaflet/js/map-api.js"></script>
+
+
+	<!-- CSS -->
+
+	<!-- leaflet -->
+	<link rel="stylesheet" type="text/css" href="/leaflet/css/leaflet.css" media="all" />
+
+	<!-- leaflet clusters -->
+	<link rel="stylesheet" type="text/css" href="/leaflet/css/MarkerCluster.css" media="all" />
+	<link rel="stylesheet" type="text/css" href="/leaflet/css/MarkerCluster.Default.css" media="all" />
+
+	<!-- leaflet custom css -->
+	<link rel="stylesheet" type="text/css" href="/leaflet/css/custom-leaflet.css" media="all" />
+</head>
+
+
 ## Marker Example Structure:
 ```javascript
 markers.push({
