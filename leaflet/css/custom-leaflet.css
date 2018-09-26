@@ -1,0 +1,25 @@
+.leaflet-div-icon {background-color: transparent; border:0px;}
+@keyframes pulsate {
+	0% {
+		-ms-transform: scale(0.5);
+		-moz-transform: scale(0.5);
+		-webkit-transform: scale(0.5);
+		transform: scale(0.5);
+		opacity: 0;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		-ms-transform: scale(2);
+		-moz-transform: scale(2);
+		-webkit-transform: scale(2);
+		transform: scale(2);
+		opacity: 0;
+	}
+}
+.leaflet-container .mymarker { width: 26px; height: 26px; position: relative; top: 0; left: 0; background: #F09B0C; border: 2px solid #FFF; border-radius: 50%; z-index: 1000; cursor: pointer; box-sizing: border-box;}
+.leaflet-container .mymarker .pin { }
+.leaflet-container .mymarker .pin-effect { width: 100%; height: 100%; position: absolute; display: block; background: #F09B0C; border-radius: 50%; opacity: 0; animation: pulsate 1s ease-out infinite; left: 0; top: 0; }
+.leaflet-container .pointer {cursor: pointer;}
+.leaflet-bottom.leaflet-right {display: none !important;}
