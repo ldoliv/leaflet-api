@@ -139,6 +139,11 @@ myLeafMap.setFilterFn(function(filter, marker) {
 });
 ```
 
+### Update Markers
+```javascript
+myLeafMap.updateMarkers(markers);
+```
+
 ### Shows all markers
 ```javascript
 myLeafMap.showAllMarkers();
