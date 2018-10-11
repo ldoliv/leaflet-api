@@ -351,7 +351,7 @@ var LeafMapApi;
 				streetview_layer = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { noWrap: true });
 				//streetview_layer = L.tileLayer('mapbox.streets', { noWrap: true });
 				//satelliteview_layer = L.tileLayer('mapbox.satellite', { noWrap: true });
-				// map.addLayer(streetview_layer);
+				map.addLayer(streetview_layer);
 
 
 				// ADD MY MARKER
