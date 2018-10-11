@@ -2,7 +2,7 @@ var LeafMapApi;
 
 (function($) {
 
-	LeafMapApi = function(customOptions) {
+	LeafMapApi: function(customOptions) {
 
 		var map;
 		var streetview_layer;
@@ -14,7 +14,6 @@ var LeafMapApi;
 		var trackLocID;
 		var myMarker = null;
 		var $eventHandler = $('<div></div>');
-
 		var Tools = {
 			object: {
 				extend: function(options, customOptions) {
@@ -45,6 +44,7 @@ var LeafMapApi;
 			},
 			mapFlyOptions: {
 				padding: [30, 30],
+				// maxZoom: 12,
 				duration: 1,
 				easeLinearity: 1,
 				animate: true,
@@ -138,11 +138,7 @@ var LeafMapApi;
 			return false;
 		}
 
-		function _removeAllMarkers() {
-			for (var i = 0; i < allMarkers.length; i++) {
-				map.removeLayer(allMarkers[i]);
-			}
-		}
+
 
 		function _showMarkers(markers) {
 
@@ -155,19 +151,16 @@ var LeafMapApi;
 					filteredBounds.push(myMarker._latlng);
 				}
 
-				if (options.useClusters) {
-					map.removeLayer(cluster);
-					cluster = new L.MarkerClusterGroup(options.clusterOptions); //disableClusteringAtZoom: 19
-				}
-
 				for (var i = 0; i < markers.length; i++) {
 					var marker = markers[i];
 
 					if (options.useClusters) {
 						cluster.addLayer(marker);
 					}
+					else {
+						marker.addTo(map);
+					}
 					filteredBounds.push(marker._latlng);
-					marker.addTo(map);
 				}
 
 				if (options.useClusters) {
@@ -178,9 +171,27 @@ var LeafMapApi;
 			}
 		}
 
+		function _removeAllMarkers() {
+			if (options.useClusters) {
+				map.removeLayer(cluster);
+				cluster = new L.MarkerClusterGroup(options.clusterOptions); //disableClusteringAtZoom: 19
+			} else {
+				for (var i = 0; i < allMarkers.length; i++) {
+					map.removeLayer(allMarkers[i]);
+				}
+			}
+		}
+
 		function _showAllMarkers() {
 
 			_showMarkers(allMarkers);
+		}
+
+		function _updateMarkers(newMarkers) {
+
+			_removeAllMarkers();
+			_createMarkers(newMarkers);
+			// _showMarkers(allMarkers);
 		}
 
 		function _filterMarkers(filter) {
@@ -193,6 +204,82 @@ var LeafMapApi;
 			_showMarkers(filtered);
 		}
 
+		function _createMarkers(markers) {
+
+			allMarkers = [];
+			boundsCenter = [];
+
+			for (var i = 0; i < markers.length; i++) {
+
+				var markerData = markers[i];
+				// console.log(markerData);
+
+				if (!((markerData.lat <= 90 && markerData.lat >= -90) && (markerData.lng <= 180 && markerData.lng >= -180))) {
+					continue;
+				}
+				if (markerData.lat == 0 && markerData.lng == 0) continue;
+
+
+				var marker = createMarker(markerData);
+
+				$(marker._icon).addClass('pointer');
+
+				marker.on('click', function(event) {
+					// console.log('clicked');
+
+					var thisContext = this;
+
+					$eventHandler.trigger('markerClick', [thisContext]);
+
+					if (options.clickDirections) {
+						var url = '';
+						if (typeof myPosition != 'undefined') {
+							url = 'https://www.google.pt/maps/dir/' + myPosition.lat + ',' + myPosition.lng + '/' + marker._latlng.lat + ',' + marker._latlng.lng;
+						} else {
+							url = 'https://maps.google.com/?q=' + thisContext.options.markerData.lat + ',' + thisContext.options.markerData.lng;
+						}
+						var win = window.open(url, '_blank');
+						win.focus();
+					}
+				});
+
+				marker.on('popupclose', function(event) {
+					var thisContext = this;
+					$eventHandler.trigger('markerPopupClose', [thisContext]);
+				});
+
+
+				if (options.usePopup) {
+					marker.bindPopup(
+						'<div class="marker-content">'+
+							options.markerPopupTmpl(markerData)+
+							// '<div class="link">'+
+								// '<a class="btn btn-secondary btn-reduced" href="' + link +'" target="_blank">Abrir Localização</a>'+
+							// '</div>'+
+						'</div>');
+				}
+
+				if (options.useClusters) {
+					cluster.addLayer(marker);
+				} else {
+					marker.addTo(map);
+					// map.addLayer(marker);
+				}
+
+				allMarkers.push(marker);
+				boundsCenter.push(marker._latlng);
+
+			}
+
+			// ADD CLUSTER LAYER TO MAP
+			if (options.useClusters) {
+				map.addLayer(cluster);
+			}
+
+			if (boundsCenter.length) {
+				map.flyToBounds(boundsCenter, options.mapFlyOptions);
+			}
+		}
 
 		function createMarker(markerData) {
 
@@ -250,6 +337,8 @@ var LeafMapApi;
 
 			options = Tools.object.extend(options, customOptions);
 
+			// console.log(options);
+
 			// SETUP LEAFLET MAP
 			// L.mapbox.accessToken = 'pk.eyJ1IjoiZGF2aWRzZXJvZGlvIiwiYSI6ImNqYnFwNjRrZTBpdjUycXBjOG0wMXR5ZmkifQ._Nu3hFZccYO_g9ug81MfSQ';
 
@@ -264,81 +353,6 @@ var LeafMapApi;
 				//satelliteview_layer = L.tileLayer('mapbox.satellite', { noWrap: true });
 				map.addLayer(streetview_layer);
 
-
-				// INSERT MARKERS ----------------------------------------------------------------------------------------
-
-				// CLUSTER
-				if (options.useClusters) {
-					cluster = new L.MarkerClusterGroup(options.clusterOptions); //disableClusteringAtZoom: 19
-				}
-
-
-				// BUILD LEAFLET MARKERS
-				for (var i = 0; i < options.markersData.length; i++) {
-
-					var markerData = options.markersData[i];
-
-					if (!((markerData.lat <= 90 && markerData.lat >= -90) && (markerData.lng <= 180 && markerData.lng >= -180))) {
-						continue;
-					}
-
-					if (markerData.lat == 0 && markerData.lng == 0) continue;
-
-
-					var marker = createMarker(markerData);
-
-					$(marker._icon).addClass('pointer');
-
-					marker.on('click', function(event) {
-						// console.log('clicked');
-
-						var thisContext = this;
-
-						$eventHandler.trigger('markerClick', [thisContext]);
-
-						if (options.clickDirections) {
-							var url = '';
-							if (typeof myPosition != 'undefined') {
-								url = 'https://www.google.pt/maps/dir/' + myPosition.lat + ',' + myPosition.lng + '/' + marker._latlng.lat + ',' + marker._latlng.lng;
-							} else {
-								url = 'https://maps.google.com/?q=' + marker._latlng.lat + ',' + marker._latlng.lng;
-							}
-							var win = window.open(url, '_blank');
-							win.focus();
-						}
-					});
-
-					marker.on('popupclose', function(event) {
-						var thisContext = this;
-						$eventHandler.trigger('markerPopupClose', [thisContext]);
-					});
-
-
-					if (options.usePopup) {
-						marker.bindPopup(
-							'<div class="marker-content">'+
-								options.markerPopupTmpl(markerData)+
-								// '<div class="link">'+
-									// '<a class="btn btn-secondary btn-reduced" href="' + link +'" target="_blank">Abrir Localização</a>'+
-								// '</div>'+
-							'</div>');
-					}
-
-					if (options.useClusters) {
-						cluster.addLayer(marker);
-					}
-
-					allMarkers.push(marker);
-					boundsCenter.push(marker._latlng);
-
-					marker.addTo(map);
-					// map.addLayer(marker);
-				}
-
-				// ADD CLUSTER LAYER TO MAP
-				if (options.useClusters) {
-					map.addLayer(cluster);
-				}
 
 				// ADD MY MARKER
 				if (options.showMyMarker) {
@@ -358,7 +372,7 @@ var LeafMapApi;
 							boundsCenter.push(myMarker._latlng);
 
 							if (map) {
-								map.flyToBounds(boundsCenter, options.mapFlyOptions);
+								// map.flyToBounds(boundsCenter, options.mapFlyOptions);
 							}
 
 						// UPDATE MY MARKER
@@ -368,13 +382,16 @@ var LeafMapApi;
 					});
 				}
 
-				// END INSERT MARKERS ----------------------------------------------------------------------------------------
+				// INSERT MARKERS ----------------------------------------------------------------------------------------
 
-
-				if (boundsCenter.length) {
-					map.flyToBounds(boundsCenter, options.mapFlyOptions);
+				// CLUSTER
+				if (options.useClusters) {
+					cluster = new L.MarkerClusterGroup(options.clusterOptions); //disableClusteringAtZoom: 19
 				}
 
+
+				// BUILD LEAFLET MARKERS
+				_createMarkers(options.markersData);
 			}
 
 		}
@@ -384,6 +401,7 @@ var LeafMapApi;
 		this.gotoMarker = _gotoMarker;
 		this.filterMarkers = _filterMarkers;
 		this.showAllMarkers = _showAllMarkers;
+		this.updateMarkers = _updateMarkers;
 		this.setFilterFn = _setFilterFn;
 		this.closePopup = _closePopup;
 		this.flyToBounds = _flyToBounds;
