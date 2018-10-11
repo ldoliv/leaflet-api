@@ -60,6 +60,7 @@ var myLeafMap = new LeafMapApi({
 	},
 	mapFlyOptions: {
 		padding: [30, 30],
+		// maxZoom: 12,
 		duration: 1,
 		easeLinearity: 1,
 		animate: true,
