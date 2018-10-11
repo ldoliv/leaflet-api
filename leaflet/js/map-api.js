@@ -2,7 +2,7 @@ var LeafMapApi;
 
 (function($) {
 
-	LeafMapApi= function(customOptions) {
+	LeafMapApi: function(customOptions) {
 
 		var map;
 		var streetview_layer;
@@ -14,7 +14,24 @@ var LeafMapApi;
 		var trackLocID;
 		var myMarker = null;
 		var $eventHandler = $('<div></div>');
-		var objectTools = Unk.tools.object;
+		var Tools = {
+			object: {
+				extend: function(options, customOptions) {
+
+					// More elaborate for when options has and inner object
+					if (typeof customOptions != 'undefined') {
+						for (property in customOptions) {
+							if (typeof customOptions[property] == 'object') {
+								$.extend(options[property], customOptions[property]);
+								delete customOptions[property];
+							}
+						}
+						$.extend(options, customOptions);
+					}
+					return options;
+				}
+			},
+		};
 
 		var options = {
 			mapIdSelector: 'categmap',
@@ -318,7 +335,7 @@ var LeafMapApi;
 
 		function _init(customOptions) {
 
-			options = objectTools.extend(options, customOptions);
+			options = Tools.object.extend(options, customOptions);
 
 			// console.log(options);
 
