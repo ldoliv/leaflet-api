@@ -80,6 +80,12 @@ var myLeafMap = new LeafMapApi({
 	},
 	clickDirections: false,
 	usePopup: true,
+	popupOptions: {
+		maxWidth: 300,
+		minWidth: 50,
+		autoPan: true,
+		keepInView: false,
+	},
 	markerPopupTmpl: function(markerData) {
 		return 	'<div class="content_map">' +
 					'<div class="content-pin">' +
