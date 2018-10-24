@@ -71,6 +71,12 @@ var LeafMapApi;
 			},
 			clickDirections: false,
 			usePopup: false,
+			popupOptions: {
+				maxWidth: 300,
+				minWidth: 50,
+				autoPan: true,
+				keepInView: false,
+			},
 			markerPopupTmpl: function(markerData) {return '';},
 			useClusters: false,
 			clusterOptions: {
@@ -253,10 +259,7 @@ var LeafMapApi;
 					marker.bindPopup(
 						'<div class="marker-content">'+
 							options.markerPopupTmpl(markerData)+
-							// '<div class="link">'+
-								// '<a class="btn btn-secondary btn-reduced" href="' + link +'" target="_blank">Abrir Localização</a>'+
-							// '</div>'+
-						'</div>');
+						'</div>', options.popupOptions);
 				}
 
 				if (options.useClusters) {
@@ -396,6 +399,13 @@ var LeafMapApi;
 
 		}
 
+		function _updateMapSize() {
+			if (typeof map != 'undefined') {
+				// console.log('called ---------------------------');
+				map.invalidateSize();
+			}
+		}
+
 		_init(customOptions);
 
 		this.gotoMarker = _gotoMarker;
@@ -405,6 +415,7 @@ var LeafMapApi;
 		this.setFilterFn = _setFilterFn;
 		this.closePopup = _closePopup;
 		this.flyToBounds = _flyToBounds;
+		this.updateMapSize = _updateMapSize;
 		this.on = function(eventTrigger, callback) {
 			// console.log(arguments);
 			$eventHandler.on(eventTrigger, callback);
