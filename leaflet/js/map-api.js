@@ -71,6 +71,7 @@ var LeafMapApi;
 			},
 			clickDirections: false,
 			usePopup: false,
+			popupLinkDirections: false,
 			popupOptions: {
 				maxWidth: 300,
 				minWidth: 50,
@@ -128,6 +129,7 @@ var LeafMapApi;
 				//map.setZoom(19);
 
 				marker.openPopup();
+				
 				map.once('moveend', function () {
 					//map.setMaxBounds(bounds);
 				});
@@ -205,6 +207,16 @@ var LeafMapApi;
 			_showMarkers(filtered);
 		}
 
+		function _getTrajectoryUrl(context) {
+			var url = '';
+			if (typeof myPosition != 'undefined') {
+				url = 'https://www.google.pt/maps/dir/' + myPosition.lat + ',' + myPosition.lng + '/' + context.options.markerData.lat + ',' + context.options.markerData.lng;
+			} else {
+				url = 'https://maps.google.com/?q=' + context.options.markerData.lat + ',' + context.options.markerData.lng;
+			}
+			return url;
+		}
+
 		function _createMarkers(markers) {
 
 			allMarkers = [];
@@ -222,39 +234,46 @@ var LeafMapApi;
 
 
 				var marker = createMarker(markerData);
-
 				$(marker._icon).addClass('pointer');
+				
 
 				marker.on('click', function(event) {
-					// console.log('clicked');
+					
+					var thisMarker = this;
+					// console.log(thisMarker);
 
-					var thisContext = this;
+					$eventHandler.trigger('markerClick', [thisMarker]);
 
-					$eventHandler.trigger('markerClick', [thisContext]);
+					url = _getTrajectoryUrl(thisMarker);
 
 					if (options.clickDirections) {
-						var url = '';
-						if (typeof myPosition != 'undefined') {
-							url = 'https://www.google.pt/maps/dir/' + myPosition.lat + ',' + myPosition.lng + '/' + marker._latlng.lat + ',' + marker._latlng.lng;
-						} else {
-							url = 'https://maps.google.com/?q=' + thisContext.options.markerData.lat + ',' + thisContext.options.markerData.lng;
-						}
 						var win = window.open(url, '_blank');
 						win.focus();
 					}
-				});
 
-				marker.on('popupclose', function(event) {
-					var thisContext = this;
-					$eventHandler.trigger('markerPopupClose', [thisContext]);
+					if (options.usePopup) {
+						
+						if (options.popupLinkDirections) {
+							thisMarker.options.markerData.link = url;
+							
+							var thisPopup = thisMarker.getPopup();
+							thisPopup.setContent('<div class="marker-content">'+
+								options.markerPopupTmpl(thisMarker.options.markerData)+
+							'</div>');
+						}
+					}
 				});
-
 
 				if (options.usePopup) {
 					marker.bindPopup(
 						'<div class="marker-content">'+
 							options.markerPopupTmpl(markerData)+
 						'</div>', options.popupOptions);
+
+					marker.on('popupclose', function(event) {
+						var thisContext = this;
+						$eventHandler.trigger('markerPopupClose', [thisContext]);
+					});
 				}
 
 				if (options.useClusters) {
@@ -275,6 +294,7 @@ var LeafMapApi;
 			}
 
 			if (boundsCenter.length) {
+				// console.log(boundsCenter);
 				map.flyToBounds(boundsCenter, options.mapFlyOptions);
 			}
 		}
@@ -370,6 +390,7 @@ var LeafMapApi;
 							boundsCenter.push(myMarker._latlng);
 
 							if (map) {
+								// console.log('flyto');
 								// map.flyToBounds(boundsCenter, options.mapFlyOptions);
 							}
 
