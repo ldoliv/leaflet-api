@@ -2,7 +2,7 @@ var LeafMapApi;
 
 (function($) {
 
-	LeafMapApi: function(customOptions) {
+	LeafMapApi = function(customOptions) {
 
 		var map;
 		var streetview_layer;
@@ -123,18 +123,13 @@ var LeafMapApi;
 			if (marker != null) {
 				// console.log(marker);
 				//map.panTo(marker._latlng, 19);
-				map.flyTo(marker._latlng, 18, {
-					duration: 0.4,
-					animate: true,
-					// easeLinearity: 0.1
-					// easeLinearity: 1
-				});
+				map.flyTo(marker._latlng, options.mapFlyOptions.maxZoom, options.mapFlyOptions);
 				//map.setView(marker._latlng);
 				//map.setZoom(19);
 
+				marker.openPopup();
 				map.once('moveend', function () {
 					//map.setMaxBounds(bounds);
-					marker.openPopup();
 				});
 
 				//setPopupInfo(marker);
