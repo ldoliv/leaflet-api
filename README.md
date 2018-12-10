@@ -79,6 +79,7 @@ var myLeafMap = new LeafMapApi({
 		popupAnchor: [0, -35]
 	},
 	clickDirections: false,
+	popupLinkDirections: false,
 	usePopup: true,
 	popupOptions: {
 		maxWidth: 300,
