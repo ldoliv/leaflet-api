@@ -47,77 +47,79 @@ markers.push({
 
 ## Leaflet Api Constructor Options
 ```javascript
-var myLeafMap = new LeafMapApi({
+if (typeof LeafMapApi != 'undefined') {
+	var myLeafMap = new LeafMapApi({
 
-	mapIdSelector: mapContainer,
-	markersData: markers,
-	mapOptions: {
-		center: [37.117435, -8.645256],
-		minZoom: 2,
-		maxZoom: 18,
-		zoom: 15,
-		scrollWheelZoom: false,
-	},
-	mapFlyOptions: {
-		padding: [30, 30],
-		// maxZoom: 12,
-		duration: 1,
-		easeLinearity: 1,
-		animate: true,
-	},
-	markerIcon: {
-		className: 'pointer',
-		iconSize: [26, 35],
-		iconAnchor: [15, 35],
-		popupAnchor: [0, -35]
-	},
-	showMyMarker: false,
-	myMarkerIcon: {
-		className: '',
-		iconSize: [26, 26],
-		iconAnchor: [15, 35],
-		popupAnchor: [0, -35]
-	},
-	clickDirections: false,
-	popupLinkDirections: false,
-	usePopup: true,
-	popupOptions: {
-		maxWidth: 300,
-		minWidth: 50,
-		autoPan: true,
-		keepInView: false,
-	},
-	markerPopupTmpl: function(markerData) {
-		return 	'<div class="content_map">' +
-					'<div class="content-pin">' +
-						'<figure>' +
-							'<img src="' + markerData.photo + '" width="296" height="221" />' +
-						'</figure>' +
-						'<h4>' + markerData.title + '</h4>'+
-						'<div class="description">' + markerData.descp + '</div>'+
-						'<a href="' + markerData.link + '" class="readmore_whatdo">Ver mais...</a>' +
-					'</div>'+
-				'</div>';
-	},
-	useClusters: false,
-	clusterOptions: {
-		showCoverageOnHover: false,
-		spiderfyDistanceMultiplier: 1.2,
-		disableClusteringAtZoom: 18,
-		spiderLegPolylineOptions: {
-			weight: 0,
-			opacity: 1
+		mapIdSelector: mapContainer,
+		markersData: markers,
+		mapOptions: {
+			center: [37.117435, -8.645256],
+			minZoom: 2,
+			maxZoom: 18,
+			zoom: 15,
+			scrollWheelZoom: false,
+		},
+		mapFlyOptions: {
+			padding: [30, 30],
+			// maxZoom: 12,
+			duration: 1,
+			easeLinearity: 1,
+			animate: true,
+		},
+		markerIcon: {
+			className: 'pointer',
+			iconSize: [26, 35],
+			iconAnchor: [15, 35],
+			popupAnchor: [0, -35]
+		},
+		showMyMarker: false,
+		myMarkerIcon: {
+			className: '',
+			iconSize: [26, 26],
+			iconAnchor: [15, 35],
+			popupAnchor: [0, -35]
+		},
+		clickDirections: false,
+		popupLinkDirections: false,
+		usePopup: true,
+		popupOptions: {
+			maxWidth: 300,
+			minWidth: 50,
+			autoPan: true,
+			keepInView: false,
+		},
+		markerPopupTmpl: function(markerData) {
+			return 	'<div class="content_map">' +
+						'<div class="content-pin">' +
+							'<figure>' +
+								'<img src="' + markerData.photo + '" width="296" height="221" />' +
+							'</figure>' +
+							'<h4>' + markerData.title + '</h4>'+
+							'<div class="description">' + markerData.descp + '</div>'+
+							'<a href="' + markerData.link + '" class="readmore_whatdo">Ver mais...</a>' +
+						'</div>'+
+					'</div>';
+		},
+		useClusters: false,
+		clusterOptions: {
+			showCoverageOnHover: false,
+			spiderfyDistanceMultiplier: 1.2,
+			disableClusteringAtZoom: 18,
+			spiderLegPolylineOptions: {
+				weight: 0,
+				opacity: 1
+			}
+		},
+		filterFn: function(filter, marker) {
+			var catId = marker.options.markerData.catId;
+
+			if (filter == catId)
+				return true;
+			else
+				return false;
 		}
-	},
-	filterFn: function(filter, marker) {
-		var catId = marker.options.markerData.catId;
-
-		if (filter == catId)
-			return true;
-		else
-			return false;
-	}
-});
+	});
+}
 ```
 
 
