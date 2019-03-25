@@ -54,8 +54,8 @@ var myLeafMap = new LeafMapApi({
 	mapOptions: {
 		center: [37.117435, -8.645256],
 		minZoom: 2,
-		maxZoom: 20,
-		zoom: 20,
+		maxZoom: 18,
+		zoom: 15,
 		scrollWheelZoom: false,
 	},
 	mapFlyOptions: {
