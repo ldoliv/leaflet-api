@@ -2,7 +2,7 @@ var LeafMapApi;
 
 (function($) {
 
-		LeafMapApi = function(customOptions) {
+	LeafMapApi = function(customOptions) {
 
 		var map;
 		var streetview_layer;
