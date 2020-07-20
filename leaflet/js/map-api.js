@@ -2,7 +2,7 @@ var LeafMapApi;
 
 (function($) {
 
-	LeafMapApi = function(customOptions) {
+		LeafMapApi = function(customOptions) {
 
 		var map;
 		var streetview_layer;
@@ -49,6 +49,7 @@ var LeafMapApi;
 				easeLinearity: 1,
 				animate: true,
 			},
+			kmlFile: '',
 			markersData: [],
 			markerIcon: {
 				//className: 'normalMarker-marker',
@@ -129,7 +130,7 @@ var LeafMapApi;
 				//map.setZoom(19);
 
 				marker.openPopup();
-				
+
 				map.once('moveend', function () {
 					//map.setMaxBounds(bounds);
 				});
@@ -235,10 +236,10 @@ var LeafMapApi;
 
 				var marker = createMarker(markerData);
 				$(marker._icon).addClass('pointer');
-				
+
 
 				marker.on('click', function(event) {
-					
+
 					var thisMarker = this;
 					// console.log(thisMarker);
 
@@ -252,10 +253,10 @@ var LeafMapApi;
 					}
 
 					if (options.usePopup) {
-						
+
 						if (options.popupLinkDirections) {
 							thisMarker.options.markerData.link = url;
-							
+
 							var thisPopup = thisMarker.getPopup();
 							thisPopup.setContent('<div class="marker-content">'+
 								options.markerPopupTmpl(thisMarker.options.markerData)+
@@ -371,6 +372,24 @@ var LeafMapApi;
 				//satelliteview_layer = L.tileLayer('mapbox.satellite', { noWrap: true });
 				map.addLayer(streetview_layer);
 
+				// KML LAYER ---------------------------------------------------------------------------------------------
+				if (options.kmlFile) {
+					fetch(options.kmlFile)
+						.then(res => res.text())
+						.then(kmltext => {
+							console.log(kmltext);
+							// Create new kml overlay
+							const parser = new DOMParser();
+							const kml = parser.parseFromString(kmltext, 'text/xml');
+							const track = new L.KML(kml);
+							map.addLayer(track);
+
+							// Adjust map to show the kml
+							const bounds = track.getBounds();
+							map.fitBounds(bounds);
+						});
+				}
+				// -------------------------------------------------------------------------------------------------------
 
 				// ADD MY MARKER
 				if (options.showMyMarker) {
