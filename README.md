@@ -50,35 +50,41 @@ markers.push({
 if (typeof LeafMapApi != 'undefined') {
 	var myLeafMap = new LeafMapApi({
 
-		mapIdSelector: mapContainer,
 		markersData: markers,
-		mapOptions: {
-			center: [37.117435, -8.645256],
-			minZoom: 2,
-			maxZoom: 18,
-			zoom: 15,
+		mapIdSelector: mapContainer,
+		initDelay: 0,
+		maxBounds: [
+			[37.374592, -8.236099],
+			[36.980350, -7.913515]
+		],
+		leafMapOptions: {
+			center: [37.136878, -8.019950],
+			minZoom: 10,
+			zoom: 10,
+			// maxZoom: 15,
 			scrollWheelZoom: false,
+			maxBoundsViscosity: 0.75
 		},
-		mapFlyOptions: {
+		leafMapFlyOptions: {
 			padding: [30, 30],
-			// maxZoom: 12,
+			maxZoom: 15,
 			duration: 1,
-			easeLinearity: 1,
+			easeLinearity: 0.25,
 			animate: true,
 		},
-		markerIcon: {
-			className: 'pointer',
-			iconSize: [26, 35],
-			iconAnchor: [15, 35],
-			popupAnchor: [0, -35]
+		leafMarkerIcon: {
+			// className: 'marker',
+			// iconSize: [26, 35],
+			// iconAnchor: [15, 35],
+			// popupAnchor: [0, -35]
 		},
-		showMyMarker: false,
-		myMarkerIcon: {
-			className: '',
-			iconSize: [26, 26],
-			iconAnchor: [15, 35],
-			popupAnchor: [0, -35]
-		},
+		showMyMarker: true,
+		// leafMyMarkerIcon: {
+			// className: 'mymarker',
+			// iconSize: [26, 26],
+			// iconAnchor: [15, 35],
+			// popupAnchor: [0, -35]
+		// },
 		clickDirections: false,
 		popupLinkDirections: false,
 		usePopup: true,
@@ -88,17 +94,23 @@ if (typeof LeafMapApi != 'undefined') {
 			autoPan: true,
 			keepInView: false,
 		},
-		markerPopupTmpl: function(markerData) {
-			return 	'<div class="content_map">' +
-						'<div class="content-pin">' +
-							'<figure>' +
-								'<img src="' + markerData.photo + '" width="296" height="221" />' +
-							'</figure>' +
-							'<h4>' + markerData.title + '</h4>'+
-							'<div class="description">' + markerData.descp + '</div>'+
-							'<a href="' + markerData.link + '" class="readmore_whatdo">Ver mais...</a>' +
-						'</div>'+
-					'</div>';
+		myMarkerPopupTmpl: function () {
+			return `<div class="marker-title">${$t('You are Here!')}</div>`;
+		},
+		markerPopupTmpl: function (markerData) {
+			return (
+				`<div class="popup-inner">
+					<div class="marker-photo">
+						<img src="${markerData.photo}" width="77" height="77" />
+					</div>
+					<div class="marker-title">
+						<a href="${markerData.link}" class="">${markerData.title}</a>
+					</div>
+					<div class="marker-collection">
+						<a href="${markerData.collectionLink}" class="">${$t('View Products')}</a>
+					</div>
+				</div>`
+			);
 		},
 		useClusters: false,
 		clusterOptions: {
