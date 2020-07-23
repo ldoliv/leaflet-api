@@ -3,20 +3,21 @@ var LeafMapApi;
 (function($) {
 
 	LeafMapApi = function(customOptions) {
-
+		
 		var map;
+		var initialized = false;
 		var streetview_layer;
 		var satelliteview_layer;
 		var cluster;
 		var allMarkers = [];
-		var boundsCenter = [];
+		var bounds = [];
 		var myPosition;
 		var trackLocID;
 		var myMarker = null;
 		var $eventHandler = $('<div></div>');
 		var Tools = {
 			object: {
-				extend: function(options, customOptions) {
+				extend: function (options, customOptions) {
 
 					// More elaborate for when options has and inner object
 					if (typeof customOptions != 'undefined') {
@@ -33,42 +34,64 @@ var LeafMapApi;
 			},
 		};
 
+		var attributionPrefix = 'Created by <a href="http://www.unykvis.com" target="_blank">Unykvis</a> | ';
+
+		var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			// attribution: attributionPrefix + 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+			// maxZoom: 17
+			attribution: ''
+		});
+
+		var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+			// maxZoom: 17,
+			// attribution: attributionPrefix + '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
+			attribution: ''
+		});
+
+		var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			// attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		});
+
 		var options = {
+			markersData: [],
 			mapIdSelector: 'categmap',
-			mapOptions: {
+			initDelay: 0,
+			maxBounds: [],
+			leafMapOptions: {
 				center: [38.7436883, -9.1952226],
 				minZoom: 2,
-				maxZoom: 18,
 				zoom: 18,
+				maxZoom: 18,
 				scrollWheelZoom: true,
+				layers: [Esri_WorldImagery, OpenStreetMap_DE],
+				dragging: !L.Browser.mobile,
+				maxBoundsViscosity: 0.75
 			},
-			mapFlyOptions: {
+			leafMapFlyOptions: {
 				padding: [30, 30],
-				// maxZoom: 12,
+				// maxZoom: 10,
 				duration: 1,
-				easeLinearity: 1,
+				easeLinearity: 0.25,
 				animate: true,
 			},
 			kmlFile: '',
-			markersData: [],
-			markerIcon: {
-				//className: 'normalMarker-marker',
-				//iconUrl: "../Content/Images/ie7/pin-shadow.png",
+			leafMarkerIcon: {
+				className: 'leaflet-default-marker',
 				//iconUrl: "pin-shadow.png",
 				// html: "<img src='../images/map/pin.png'/>",
-				iconSize: [30, 35],
-				iconAnchor: [15, 35],
-				popupAnchor: [0, -35]
+				// iconSize: [30, 35],
+				// iconAnchor: [15, 35],
+				// popupAnchor: [0, -35]
 			},
 			showMyMarker: true,
-			myMarkerIcon: {
-				//className: 'normalMarker-marker',
-				//iconUrl: "../Content/Images/ie7/pin-shadow.png",
+			leafMyMarkerIcon: {
+				className: 'leaflet-my-marker',
 				//iconUrl: "pin-shadow.png",
 				// html: "<img src='../images/map/pin.png'/>",
-				iconSize: [30, 35],
-				iconAnchor: [15, 35],
-				popupAnchor: [0, -35]
+				iconSize: [26, 26],
+				iconAnchor: [13, 26],
+				popupAnchor: [0, -26]
 			},
 			clickDirections: false,
 			usePopup: false,
@@ -79,7 +102,18 @@ var LeafMapApi;
 				autoPan: true,
 				keepInView: false,
 			},
-			markerPopupTmpl: function(markerData) {return '';},
+			myMarkerPopupTmpl: function() {
+				return `<div class="marker-title">Está Aqui!</div>`;
+			},
+			markerPopupTmpl: function (markerData) {
+				return (
+					`<div class="marker-photo">
+						<img src="${markerData.photo}" width="77" height="77" />
+					</div>
+					<a href="${markerData.link}" class="marker-title">${markerData.title}</a>
+					<div class="marker-description">${markerData.descp}</div>`
+				);
+			},
 			useClusters: false,
 			clusterOptions: {
 				showCoverageOnHover: false,
@@ -90,9 +124,8 @@ var LeafMapApi;
 					opacity: 1
 				}
 			},
-			filterFn: function() {}
+			filterFn: function () { }
 		};
-
 
 		function _closePopup(popup) {
 			if (typeof popup != 'undefined') {
@@ -106,9 +139,9 @@ var LeafMapApi;
 			}
 		}
 
-		function _flyToBounds(bounds) {
-			bounds = bounds || boundsCenter;
-			map.flyToBounds(bounds, options.mapFlyOptions);
+		function _flyToBounds(newBounds) {
+			newBounds = newBounds || bounds;
+			map.flyToBounds(newBounds, options.leafMapFlyOptions);
 		}
 
 		function _gotoMarker(id) {
@@ -125,7 +158,7 @@ var LeafMapApi;
 			if (marker != null) {
 				// console.log(marker);
 				//map.panTo(marker._latlng, 19);
-				map.flyTo(marker._latlng, options.mapFlyOptions.maxZoom, options.mapFlyOptions);
+				map.flyTo(marker._latlng, options.leafMapFlyOptions.maxZoom, options.leafMapFlyOptions);
 				//map.setView(marker._latlng);
 				//map.setZoom(19);
 
@@ -142,18 +175,12 @@ var LeafMapApi;
 			return false;
 		}
 
-
-
 		function _showMarkers(markers) {
 
 			if (markers.length) {
-				_removeAllMarkers();
+				_removeAllMarkersFromMap();
 
-				var filteredBounds = [];
-
-				if (myMarker != null) {
-					filteredBounds.push(myMarker._latlng);
-				}
+				bounds = [];
 
 				for (var i = 0; i < markers.length; i++) {
 					var marker = markers[i];
@@ -164,18 +191,25 @@ var LeafMapApi;
 					else {
 						marker.addTo(map);
 					}
-					filteredBounds.push(marker._latlng);
+
+					bounds.push(marker._latlng);
+				}
+
+				var boundsCopy = bounds.slice();
+
+				if (myMarker) {
+					boundsCopy.push(myMarker._latlng);
 				}
 
 				if (options.useClusters) {
 					map.addLayer(cluster);
 				}
 
-				map.flyToBounds(filteredBounds, options.mapFlyOptions);
+				_flyToBounds(boundsCopy);
 			}
 		}
 
-		function _removeAllMarkers() {
+		function _removeAllMarkersFromMap() {
 			if (options.useClusters) {
 				map.removeLayer(cluster);
 				cluster = new L.MarkerClusterGroup(options.clusterOptions); //disableClusteringAtZoom: 19
@@ -187,22 +221,21 @@ var LeafMapApi;
 		}
 
 		function _showAllMarkers() {
-
 			_showMarkers(allMarkers);
 		}
 
 		function _updateMarkers(newMarkers) {
-
-			_removeAllMarkers();
+			_removeAllMarkersFromMap();
 			_createMarkers(newMarkers);
-			// _showMarkers(allMarkers);
 		}
 
-		function _filterMarkers(filter) {
+		function _filterMarkers(filterFN) {
 
-			var filtered = allMarkers.filter(function(marker) {
-				return options.filterFn(filter, marker);
-			});
+			// var filtered = allMarkers.filter(function (marker) {
+			// 	return options.filterFn(filter, marker);
+			// });
+
+			var filtered = allMarkers.filter(filterFN);
 
 			// console.log(filtered);
 			_showMarkers(filtered);
@@ -221,7 +254,7 @@ var LeafMapApi;
 		function _createMarkers(markers) {
 
 			allMarkers = [];
-			boundsCenter = [];
+			bounds = [];
 
 			for (var i = 0; i < markers.length; i++) {
 
@@ -238,7 +271,7 @@ var LeafMapApi;
 				$(marker._icon).addClass('pointer');
 
 
-				marker.on('click', function(event) {
+				marker.on('click', function (event) {
 
 					var thisMarker = this;
 					// console.log(thisMarker);
@@ -258,20 +291,15 @@ var LeafMapApi;
 							thisMarker.options.markerData.link = url;
 
 							var thisPopup = thisMarker.getPopup();
-							thisPopup.setContent('<div class="marker-content">'+
-								options.markerPopupTmpl(thisMarker.options.markerData)+
-							'</div>');
+							thisPopup.setContent('<div class="marker-content">' + options.markerPopupTmpl(thisMarker.options.markerData) + '</div>');
 						}
 					}
 				});
 
 				if (options.usePopup) {
-					marker.bindPopup(
-						'<div class="marker-content">'+
-							options.markerPopupTmpl(markerData)+
-						'</div>', options.popupOptions);
+					marker.bindPopup('<div class="marker-content">' + options.markerPopupTmpl(markerData) + '</div>', options.popupOptions);
 
-					marker.on('popupclose', function(event) {
+					marker.on('popupclose', function (event) {
 						var thisContext = this;
 						$eventHandler.trigger('markerPopupClose', [thisContext]);
 					});
@@ -285,8 +313,7 @@ var LeafMapApi;
 				}
 
 				allMarkers.push(marker);
-				boundsCenter.push(marker._latlng);
-
+				bounds.push(marker._latlng);
 			}
 
 			// ADD CLUSTER LAYER TO MAP
@@ -294,83 +321,176 @@ var LeafMapApi;
 				map.addLayer(cluster);
 			}
 
-			if (boundsCenter.length) {
-				// console.log(boundsCenter);
-				map.flyToBounds(boundsCenter, options.mapFlyOptions);
+			if (bounds.length && !options.showMyMarker) {
+				// console.log(bounds);
+
+				if (!initialized) {
+					setTimeout(function() {
+						_flyToBounds(bounds);
+					}, options.initDelay);
+				} else {
+					_flyToBounds(bounds);
+				}
 			}
 		}
 
 		function createMarker(markerData) {
 
-			return L.marker(new L.LatLng(markerData.lat, markerData.lng), {
+			var markerOptions = {
 				id: markerData.id,
-				icon: L.divIcon($.extend(options.markerIcon, {
-					html: "<img src='" + markerData.pinImg + "'/>",
-				})),
 				title: markerData.title,
 				alt: markerData.alt,
 				markerData: markerData,
 				riseOnHover: true,
-				// lngLat: [latlng.lng, latlng.lat]
-			});
+			};
+
+			if (markerData.pinImg) {
+				markerOptions.icon = L.divIcon($.extend(options.leafMarkerIcon, {
+					html: "<img src='" + markerData.pinImg + "'/>",
+				}));
+			}
+
+			return L.marker(new L.LatLng(markerData.lat, markerData.lng), markerOptions);
 		}
 
 		function createMyMarker(markerData) {
-			return L.marker(new L.LatLng(markerData.lat, markerData.lng), {
-				icon: L.divIcon($.extend(options.myMarkerIcon, {
+
+			var markerOptions = {
+				icon: L.divIcon($.extend(options.leafMyMarkerIcon, {
 					html: '<div class="mymarker"><div class="pin"></div><div class="pin-effect"></div></div>',
-					// iconSize: [30, 35],
-					// iconAnchor: [15, 35],
 				})),
-				riseOnHover: true,
-				// lngLat: [latlng.lng, latlng.lat]
-			});
+				riseOnHover: true
+			};
+
+			var myMarker = L.marker(new L.LatLng(markerData.lat, markerData.lng), markerOptions);
+			if (options.usePopup) {
+				myMarker.bindPopup('<div class="marker-content">' + options.myMarkerPopupTmpl() + '</div>', options.popupOptions);
+				myMarker.on('popupclose', function (event) {
+					var thisContext = this;
+					$eventHandler.trigger('markerPopupClose', [thisContext]);
+				});
+			}
+			map.addLayer(myMarker);
+			return myMarker;
 		}
 
+		var geoLocation = (function () {
 
-		function getGeolocation(callback) {
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(function (position) {
-					if (typeof callback != 'undefined') {
-						callback({
-							lat: position.coords.latitude,
-							lng: position.coords.longitude
-						});
+			var isInit = false;
+			var callbackFNs = [];
+			var latLng = null;
+			var trackLocID;
+
+			var successCB = function(position) {
+				// console.log('getCurrentPosition');
+				latLng = {
+					lat: position.coords.latitude,
+					lng: position.coords.longitude,
+				}
+
+				callbackFNs.forEach(function (callbackFN) {
+					return callbackFN(latLng);
+				});
+			}
+
+			var errorCB = function(error) {
+				// console.log('geolocation error: ', error);
+				latLng = null;
+				callbackFNs.forEach(function (callbackFN) {
+					return callbackFN(latLng);
+				});
+			}
+
+			function init() {
+				if (!isInit) {
+					if (navigator.geolocation) {
+
+						navigator.geolocation.getCurrentPosition(successCB, errorCB);
+						trackLocID = navigator.geolocation.watchPosition(successCB, errorCB);
+
+						isInit = true;
 					}
-				}, function () {
-					console.log('geolocation error');
+				}
+			}
+
+			function getCoordinates(newCallback) {
+
+				var found = callbackFNs.find(function(callbackFN) {
+					return callbackFN.toString() == newCallback.toString()
 				});
 
-				trackLocID = navigator.geolocation.watchPosition(function (position) {
-					if (typeof callback != 'undefined') {
-						callback({
-							lat: position.coords.latitude,
-							lng: position.coords.longitude
-						});
+				if (!found) {
+					callbackFNs.push(newCallback);
+				}
+
+				if (!isInit) {
+					init();
+				} else {
+					newCallback(latLng);
+				}
+			}
+
+			function removeListener(fn) {
+				callbackFNs.forEach(function (callbackFN, index) {
+					if (callbackFN.toString() == fn.toString()) {
+						// console.log('found listener');
+						callbackFNs.splice(index, 1);
+						// console.log(callbackFNs.length);
 					}
 				});
 			}
-		}
+
+			return {
+				init: init,
+				getCoordinates: getCoordinates,
+				removeListener: removeListener
+			}
+		})();
 
 		function _init(customOptions) {
 
 			options = Tools.object.extend(options, customOptions);
 
-			// console.log(options);
-
-			// SETUP LEAFLET MAP
-			// L.mapbox.accessToken = 'pk.eyJ1IjoiZGF2aWRzZXJvZGlvIiwiYSI6ImNqYnFwNjRrZTBpdjUycXBjOG0wMXR5ZmkifQ._Nu3hFZccYO_g9ug81MfSQ';
-
-			// options.mapOptions.renderer = L.canvas();
 			if (document.getElementById(options.mapIdSelector)) {
 
-				map = L.map(options.mapIdSelector, options.mapOptions);
+				// DETERMINE AND APPLY MAX ZOOM -------------------------------------
+				var maxZoom = options.leafMapOptions.maxZoom;
+				options.leafMapOptions.layers.forEach(function (tileLayer) {
+					maxZoom = tileLayer.options.maxZoom < maxZoom ? tileLayer.options.maxZoom : maxZoom;
+				});
 
-				// MAP VIEW
-				streetview_layer = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { noWrap: true });
-				//streetview_layer = L.tileLayer('mapbox.streets', { noWrap: true });
-				//satelliteview_layer = L.tileLayer('mapbox.satellite', { noWrap: true });
-				map.addLayer(streetview_layer);
+				options.leafMapOptions.maxZoom = maxZoom;
+				options.leafMapFlyOptions.maxZoom = options.leafMapFlyOptions.maxZoom < maxZoom ? options.leafMapFlyOptions.maxZoom : maxZoom;
+				// ------------------------------------------------------------------
+
+				// APPLY MAX BOUNDS TO MAP ------------------------------------------
+				if (options.maxBounds.length == 2) {
+					options.leafMapOptions.maxBounds = new L.LatLngBounds(
+						new L.LatLng(options.maxBounds[0][0], options.maxBounds[0][1]),
+						new L.LatLng(options.maxBounds[1][0], options.maxBounds[1][1])
+					);
+				}
+				// ------------------------------------------------------------------
+
+
+				// SETUP LEAFLET MAP
+				// L.mapbox.accessToken = 'pk.eyJ1IjoiZGF2aWRzZXJvZGlvIiwiYSI6ImNqYnFwNjRrZTBpdjUycXBjOG0wMXR5ZmkifQ._Nu3hFZccYO_g9ug81MfSQ';
+				// options.leafMapOptions.renderer = L.canvas();
+
+				map = L.map(options.mapIdSelector, options.leafMapOptions);
+
+				// DEFAULT SELECTED LAYER
+				map.addLayer(OpenStreetMap_DE);
+
+				$eventHandler.trigger('mapinit');
+
+				L.control.layers({
+					"Satellite": Esri_WorldImagery,
+					"Mapa": OpenStreetMap_DE,
+				}, null, {
+					collapsed: true
+				}).addTo(map);
+
 
 				// KML LAYER ---------------------------------------------------------------------------------------------
 				if (options.kmlFile) {
@@ -394,28 +514,33 @@ var LeafMapApi;
 				// ADD MY MARKER
 				if (options.showMyMarker) {
 
-					getGeolocation(function(latLng) {
+					geoLocation.getCoordinates(function (latLng) {
 
-						myPosition = latLng;
-						// console.log(myPosition);
+						// console.log(latLng);
+						if (latLng) {
+							myPosition = latLng;
 
-						// CREATE MY MARKER
-						if (myMarker == null) {
+							var boundsCopy = bounds.slice();	// copy
 
-							// console.log(latLng);
+							// CREATE MY MARKER
+							if (!myMarker) {
+								myMarker = createMyMarker(latLng);
+								boundsCopy.push(myMarker._latlng);
+								_flyToBounds(boundsCopy);
 
-							myMarker = createMyMarker(latLng);
-							map.addLayer(myMarker);
-							boundsCenter.push(myMarker._latlng);
+							} else {
+								// UPDATE MY MARKER
+								var flyToMinDistance = 100;	// meters
+								var newPosition = L.latLng(latLng.lat, latLng.lng);
+								var diffMetersDistance = myMarker._latlng.distanceTo(newPosition);
 
-							if (map) {
-								// console.log('flyto');
-								// map.flyToBounds(boundsCenter, options.mapFlyOptions);
+								myMarker.setLatLng(latLng);
+
+								if (diffMetersDistance > flyToMinDistance) {
+									boundsCopy.push(myMarker._latlng);
+									_flyToBounds(boundsCopy);
+								}
 							}
-
-						// UPDATE MY MARKER
-						} else {
-							myMarker.setLatLng(latLng);
 						}
 					});
 				}
@@ -427,11 +552,11 @@ var LeafMapApi;
 					cluster = new L.MarkerClusterGroup(options.clusterOptions); //disableClusteringAtZoom: 19
 				}
 
-
 				// BUILD LEAFLET MARKERS
 				_createMarkers(options.markersData);
-			}
 
+				initialized = true;
+			}
 		}
 
 		function _updateMapSize() {
@@ -451,7 +576,7 @@ var LeafMapApi;
 		this.closePopup = _closePopup;
 		this.flyToBounds = _flyToBounds;
 		this.updateMapSize = _updateMapSize;
-		this.on = function(eventTrigger, callback) {
+		this.on = function (eventTrigger, callback) {
 			// console.log(arguments);
 			$eventHandler.on(eventTrigger, callback);
 			// $eventHandler.on(arguments);
