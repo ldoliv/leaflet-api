@@ -293,7 +293,7 @@ var LeafMapApi;
 						if (options.usePopup) {
 
 							if (options.popupLinkDirections) {
-								thisMarker.options.markerData.link = url;
+								thisMarker.options.markerData.googleLink = url;
 
 								var thisPopup = thisMarker.getPopup();
 								thisPopup.setContent('<div class="marker-content ' + options.leafMarkerIcon.className + '">' + options.markerPopupTmpl(thisMarker.options.markerData) + '</div>');
